@@ -1,0 +1,183 @@
+<!doctype>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>KaiX</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "css/index.css" %}">
+    <script src="{% static "js/jquery-3.3.1.min.js" %}"></script>
+    <script src="{% static "js/bootstrap.min.js" %}"></script>
+</head>
+<body>
+<header>
+<nav class="navbar nav-tabs navbar-fixed-top">
+<div class="container">
+  <div class="container-fluid">
+    <div class="navbar-header col-sm-4">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="glyphicon glyphicon-menu-hamburger"></span>
+        <span class="icon-bar"></span> <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{% url 'blog:index' %}">KaiX</a>
+    </div>
+    <div class="collapse navbar-collapse col-lg-8" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li><a href="{% url 'blog:index' %}">主页</a></li>
+        <li><a href="{% url 'blog:analysis' %}">分析</a></li></ul>
+
+    </div>
+  </div>
+</div>
+</nav>
+</header>
+<div class="container">
+    <div class="row">
+        <div id="left" class="col-sm-3 nav nav-pills nav-stacked hidden-xs" style="position:fixed">
+            <div class="col-lg-12 search">
+                <form action="{% url 'blog:search' %}" method="POST" class="form-inline"role="form">
+                    <div class="form-group">
+                        <label class="sr-only" for="title">名称</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="搜索全站">
+                    </div>
+                    <button type="submit" class="btn btn-default" onclick="onClick()" >查询</button>
+                </form>
+            </div>
+            <div class="col-sm-12 subtitle"><h4>热门分类</h4></div>
+            <div class="col-sm-12 content">
+                <div class="col-sm-3 label" style="background-color: #036564;">
+                    <a href="{% url 'blog:blog_category' 'love' %}">爱情</a>
+                </div>
+                <div class="col-sm-3 label" style="background-color: #eb6841;">
+                    <a href="{% url 'blog:blog_category' 'family' %}">亲情</a>
+                </div>
+                <div class="col-sm-3 label" style="background-color: #3fb8af;">
+                    <a href="{% url 'blog:blog_category' 'friend' %}">友情</a>
+                </div>
+                <div class="col-sm-3 label" style="background-color: #fe4365;">
+                    <a href="{% url 'blog:blog_category' 'life' %}">生活</a>
+                </div>
+                <div class="col-sm-3 label" style="background-color: #fc9d9a;">
+                    <a href="{% url 'blog:blog_category' 'school' %}">校园</a>
+                </div>
+                <div class="col-sm-3 label" style="background-color: #3299bb;">
+                    <a href="{% url 'blog:blog_category' 'classic' %}">经典</a>
+                </div>
+                <div class="col-sm-3 label" style="background-color: #c8c8a9;">
+                    <a href="{% url 'blog:blog_category' 'philosophy' %}">哲理</a>
+                </div>
+                <div class="col-sm-3 label" style="background-color: #83af9b;">
+                    <a href="{% url 'blog:blog_category' 'encourage' %}">励志</a>
+                </div>
+                <div class="col-sm-3 label" style="background-color: #8a9b0f;">
+                    <a href="{% url 'blog:blog_category' 'funny' %}">搞笑</a>
+                </div>
+                <div class="col-sm-3 label" style="background-color: #eb6841;">
+                    <a href="{% url 'blog:blog_category' 'diary' %}">日记</a>
+                </div>
+            </div>
+            <div class="col-sm-12 subtitle"><h4>热门文章</h4></div>
+            <div class="col-sm-12 content">
+                {% for foo in topic_blog %}
+                    <li class="col-sm-12"><a href="{% url 'blog:blog_page' foo.blog_id %}">{{ foo.blog_title }}</a></li>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="right" class="col-sm-8" style="float: right;">
+            <div></div>
+        </div>
+        <div class="goTop">
+            <span class="glyphicon glyphicon-chevron-up"></span>
+        </div>
+    </div>
+</div>
+<!--异步加载文章-->
+<script type="text/javascript">
+    var jsonDate = {{ title|safe }};
+    var title = jsonDate.title;
+    console.log(title);
+    function getBlog(x, title) {
+        $.ajax({
+            url: '/blogs/search/ajax/',
+            type: 'GET',
+            data: {'number': x,'title':title},
+            success: function (blogs) {
+                var blogs = eval(blogs)
+                for (var i in blogs) {
+                    var rightDiv = document.getElementById("right");
+                    var newDiv = document.createElement("div");
+                    var newChildDiv = document.createElement("div");
+                    var newH3 = document.createElement("h3");
+                    var newA = document.createElement("a");
+                    var newH5 = document.createElement("h5");
+                    var newP = document.createElement("p");
+                    newDiv.style = "border-radius:10px; background-color: #ffffff; margin: 10px; height:auto";
+                    newChildDiv.style = "padding: 10px;";
+                    newA.href = "/blogs/" + blogs[i].blog_id;
+                    newDiv.appendChild(newChildDiv);
+                    newChildDiv.appendChild(newH3);
+                    newH3.appendChild(newA);
+                    newChildDiv.appendChild(newH5);
+                    newChildDiv.appendChild(newP);
+                    newA.innerHTML = blogs[i].blog_title;
+                    newH5.innerHTML = '时间： ' + blogs[i].blog_date_time + ' 浏览量： ' + blogs[i].blog_view;
+                    newP.innerHTML = blogs[i].blog_content;
+                    var objDivs = rightDiv.getElementsByTagName("DIV");
+                    var reforeNode = objDivs[objDivs.length - 1]
+                    rightDiv.insertBefore(newDiv, reforeNode.nextSibling);
+                }
+            }
+        })
+    };
+    var x = 0;
+    window.onload = function(){
+        setTimeout(function(){
+            $(window).scrollTop(0);
+            getBlog(x, title);
+            x = 0;
+        },10);
+    };
+    $(window).scroll(function() {
+        if ($(document).scrollTop() + document.body.clientHeight == $(document).height()) {
+            x += 10;
+            getBlog(x, title);
+        }
+    })
+</script>
+<!--返回顶部函数-->
+<script type="text/javascript">
+    function goTop(min_height) {
+        $(".goTop").click(
+            function() {
+                $('html,body').animate({
+                    scrollTop: 0
+                }, 700);
+            });
+        //获取页面的最小高度，无传入值则默认为600像素
+        min_height=min_height?min_height:400;
+        //为窗口的scroll事件绑定处理函数
+        $(window).scroll(function() {
+            //获取窗口的滚动条的垂直位置
+            var s = $(window).scrollTop();
+            //当窗口的滚动条的垂直位置大于页面的最小高度时，让返回顶部元素渐现，否则渐隐
+            if (s > min_height) {
+                $(".goTop").fadeIn(100);
+            } else {
+                $(".goTop").fadeOut(200);
+            }
+        });
+    }
+    $(function() {
+        goTop();
+    });
+</script>
+<script type="text/javascript">
+    function onClick() {
+        var title = document.getElementById("title");
+        console.log(title.value);
+        if(title.value == '')
+            alert('输入为空');
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+* {
+    padding: 0px;
+    margin-top: 0px;
+}
+.box {
+    padding: 20px;
+    margin-top: 10px;
+    border-radius: 3px;
+    background-color: #FFFFFF;
+    box-shadow: 2px 2px 5px gray;
+    text-align: center;
+}
